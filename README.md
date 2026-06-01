@@ -25,4 +25,5 @@ uvicorn app:app --reload
 - Agencia ($99/mes): Ilimitadas + branding
 
 ## Licencia
-Privado — Ranuk IT Solutions
+
+MIT — © 2026 Ranuk IT Solutions | ranuk.dev
