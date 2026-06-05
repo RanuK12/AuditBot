@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuditBot - AI-Powered Website Audit & Comparison</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);color:#fff;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center}
+        .container{max-width:900px;padding:2rem;text-align:center}
+        h1{font-size:3.5rem;font-weight:800;margin-bottom:1rem;background:linear-gradient(90deg,#00d2ff,#3a7bd5);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .subtitle{font-size:1.2rem;color:#b0b0d0;margin-bottom:2.5rem;line-height:1.6}
+        .features{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem;margin:2rem 0}
+        .feature-card{background:rgba(255,255,255,0.05);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:1.5rem;transition:transform 0.3s,box-shadow 0.3s}
+        .feature-card:hover{transform:translateY(-5px);box-shadow:0 10px 30px rgba(0,210,255,0.15)}
+        .feature-card.highlight{border-color:#00d2ff;background:rgba(0,210,255,0.08)}
+        .feature-card.highlight:hover{box-shadow:0 10px 40px rgba(0,210,255,0.25)}
+        .feature-card h3{font-size:1.3rem;margin-bottom:0.5rem;color:#00d2ff}
+        .feature-card p{font-size:0.9rem;color:#a0a0c0}
+        .feature-card .badge{display:inline-block;background:linear-gradient(90deg,#00d2ff,#3a7bd5);color:#fff;font-size:0.7rem;font-weight:700;padding:0.2rem 0.6rem;border-radius:20px;margin-bottom:0.5rem;text-transform:uppercase;letter-spacing:0.05em}
+        .audit-form{margin:2rem 0;padding:1.5rem;background:rgba(255,255,255,0.03);border:1px solid rgba(255,215,0,0.3);border-radius:16px;text-align:left}
+        .audit-form h2{font-size:1.2rem;color:#ffd700;margin-bottom:1rem}
+        .audit-form input[type=text]{width:100%;padding:0.8rem 1rem;border:1px solid rgba(255,215,0,0.3);border-radius:10px;background:rgba(0,0,0,0.3);color:#fff;font-size:0.95rem;margin-bottom:1rem;outline:none}
+        .audit-form input[type=text]:focus{border-color:#ffd700;box-shadow:0 0 15px rgba(255,215,0,0.15)}
+        .audit-form input[type=text]::placeholder{color:#606080}
+        .audit-form .btn-row{display:flex;gap:1rem;flex-wrap:wrap}
+        .audit-form .btn{padding:0.7rem 1.8rem;border:none;border-radius:50px;font-size:0.95rem;font-weight:600;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s;text-decoration:none;display:inline-block}
+        .audit-form .btn:hover{transform:scale(1.05)}
+        .btn-json{background:linear-gradient(90deg,#00d2ff,#3a7bd5);color:#fff}
+        .btn-json:hover{box-shadow:0 8px 25px rgba(0,210,255,0.3)}
+        .btn-pdf{background:linear-gradient(90deg,#ffd700,#ff8c00);color:#1a1a2e}
+        .btn-pdf:hover{box-shadow:0 8px 25px rgba(255,215,0,0.3)}
+        .btn-pdf:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+        #audit-result{margin-top:1.5rem;padding:1rem;background:rgba(0,0,0,0.3);border-radius:12px;display:none;max-height:400px;overflow-y:auto}
+        #audit-result pre{font-size:0.75rem;color:#a0c0e0;white-space:pre-wrap;word-break:break-all}
+        #audit-result .score-badge{display:inline-block;padding:0.4rem 1.2rem;border-radius:20px;font-weight:700;font-size:1.1rem;margin-bottom:0.8rem}
+        .score-a{background:rgba(0,255,136,0.15);color:#00ff88;border:1px solid rgba(0,255,136,0.3)}
+        .score-b{background:rgba(0,210,255,0.15);color:#00d2ff;border:1px solid rgba(0,210,255,0.3)}
+        .score-c{background:rgba(255,215,0,0.15);color:#ffd700;border:1px solid rgba(255,215,0,0.3)}
+        .score-d{background:rgba(255,140,0,0.15);color:#ff8c00;border:1px solid rgba(255,140,0,0.3)}
+        .score-f{background:rgba(255,50,50,0.15);color:#ff5050;border:1px solid rgba(255,50,50,0.3)}
+        .spinner{display:inline-block;width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.6s linear infinite;margin-right:0.5rem;vertical-align:middle}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        .cta-button{display:inline-block;padding:1rem 2.5rem;font-size:1.1rem;font-weight:600;color:#fff;background:linear-gradient(90deg,#00d2ff,#3a7bd5);border:none;border-radius:50px;cursor:pointer;text-decoration:none;transition:transform 0.3s,box-shadow 0.3s;margin-top:1.5rem}
+        .cta-button:hover{transform:scale(1.05);box-shadow:0 10px 30px rgba(0,210,255,0.3)}
+        .cta-secondary{background:transparent;border:2px solid rgba(0,210,255,0.4);margin-left:1rem}
+        .status{margin-top:2rem;padding:1rem 2rem;background:rgba(0,210,255,0.1);border:1px solid rgba(0,210,255,0.3);border-radius:12px;display:inline-block}
+        .status-dot{width:10px;height:10px;background:#00ff88;border-radius:50%;display:inline-block;margin-right:0.5rem;animation:pulse 2s infinite}
+        @keyframes pulse{0%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(1.2)}100%{opacity:1;transform:scale(1)}}
+        .api-section{margin-top:2.5rem;padding:1.5rem;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:16px;text-align:left}
+        .api-section h2{font-size:1.2rem;color:#00d2ff;margin-bottom:1rem}
+        .api-section code{background:rgba(0,210,255,0.1);padding:0.2rem 0.5rem;border-radius:6px;font-size:0.85rem;color:#b0d0ff}
+        .api-section pre{background:rgba(0,0,0,0.3);padding:1rem;border-radius:10px;overflow-x:auto;margin:0.8rem 0;font-size:0.8rem;color:#c0c0e0}
+        footer{margin-top:3rem;font-size:0.8rem;color:#606080}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AuditBot</h1>
+        <p class="subtitle">AI-powered website auditing that automates performance, security, SEO, and accessibility checks. Compare any two sites side-by-side and get actionable insights.</p>
+
+        <div class="features">
+            <div class="feature-card highlight">
+                <span class="badge">NEW</span>
+                <h3>&#x2694;&#xFE0F; Comparative Analysis</h3>
+                <p>Compare any two websites side-by-side. Performance delta, security headers, SEO score, accessibility violations &mdash; with percentage breakdowns.</p>
+            </div>
+            <div class="feature-card">
+                <h3>&#x1F4CB; Smart Audits</h3>
+                <p>Automated WCAG 2.1 AA compliance checks with adaptive rule engines and axe-core integration.</p>
+            </div>
+            <div class="feature-card">
+                <h3>&#x1F4CA; Risk Analysis</h3>
+                <p>Real-time risk scoring with Lighthouse metrics, Core Web Vitals, and security header analysis.</p>
+            </div>
+            <div class="feature-card">
+                <h3>&#x1F916; API First</h3>
+                <p>REST API with /audit and /compare endpoints. Integrate into your CI/CD pipeline or custom dashboards.</p>
+            </div>
+        </div>
+
+        <a href="/docs" class="cta-button">Explore API Docs</a>
+        <a href="https://github.com/RanuK12/AuditBot" class="cta-button cta-secondary">GitHub</a>
+
+        <!-- Interactive Audit Tool -->
+        <div class="audit-form">
+            <h2>&#x1F50D; Quick Accessibility Audit</h2>
+            <p style="color:#a0a0c0;margin-bottom:1rem;font-size:0.9rem">Enter a URL to scan. Get JSON results or download a professional PDF report.</p>
+            <input type="text" id="audit-url" placeholder="https://example.com" />
+            <div class="btn-row">
+                <button class="btn btn-json" onclick="runAudit('json')">&#x1F4CB; Run Audit (JSON)</button>
+                <button class="btn btn-pdf" id="btn-pdf" onclick="runAudit('pdf')">&#x1F4C4; Download PDF Report</button>
+            </div>
+            <div id="audit-result"></div>
+        </div>
+
+        <div class="status">
+            <span class="status-dot"></span>
+            System Status: Operational
+        </div>
+
+        <div class="api-section">
+            <h2>Quick Start &mdash; Compare Two Sites</h2>
+            <pre>curl -X POST https://auditbot.ranuk.dev/compare \
+  -H "Content-Type: application/json" \
+  -d '{"url_a": "https://site-a.com", "url_b": "https://site-b.com"}'</pre>
+            <h2>Single Site Audit</h2>
+            <pre>curl "https://auditbot.ranuk.dev/audit?url=https://example.com"</pre>
+            <h2>CLI</h2>
+            <pre>python3 auditbot.py analyze --url-a https://site-a.com --url-b https://site-b.com
+python3 auditbot.py compare --domain mysite.com --competitors rival1.com,rival2.com</pre>
+        </div>
+
+        <footer>
+            &copy; 2026 AuditBot by <a href="https://ranuk.dev" style="color:#00d2ff;text-decoration:none">Ranuk IT Solutions</a>. All rights reserved. Built with AI.
+        </footer>
+    </div>
+
+    <script>
+    function runAudit(mode) {
+        const urlInput = document.getElementById('audit-url');
+        const url = urlInput.value.trim();
+        if (!url) { urlInput.focus(); return; }
+        const resultDiv = document.getElementById('audit-result');
+        const btnPdf = document.getElementById('btn-pdf');
+
+        if (mode === 'pdf') {
+            btnPdf.disabled = true;
+            btnPdf.innerHTML = '<span class="spinner"></span>Generating PDF...';
+            const a = document.createElement('a');
+            a.href = '/audit/report?url=' + encodeURIComponent(url);
+            a.download = '';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => {
+                btnPdf.disabled = false;
+                btnPdf.innerHTML = '&#x1F4C4; Download PDF Report';
+            }, 5000);
+            return;
+        }
+
+        resultDiv.style.display = 'block';
+        resultDiv.innerHTML = '<span class="spinner"></span> Running accessibility audit...';
+
+        fetch('/audit?url=' + encodeURIComponent(url))
+            .then(r => r.json())
+            .then(data => {
+                const v = data.violations || [];
+                const total = data.totalViolations || 0;
+                const impacts = {};
+                v.forEach(x => { const i = x.impact || 'unknown'; impacts[i] = (impacts[i]||0) + 1; });
+
+                let score = 100;
+                const pen = { critical: 30, serious: 15, moderate: 5, minor: 1 };
+                Object.entries(impacts).forEach(([k,c]) => { score -= (pen[k]||0)*c; });
+                score = Math.max(0, score);
+
+                let grade, cls;
+                if (score >= 90) { grade = 'A+'; cls = 'score-a'; }
+                else if (score >= 80) { grade = 'A'; cls = 'score-a'; }
+                else if (score >= 70) { grade = 'B'; cls = 'score-b'; }
+                else if (score >= 60) { grade = 'C'; cls = 'score-c'; }
+                else if (score >= 50) { grade = 'D'; cls = 'score-d'; }
+                else { grade = 'F'; cls = 'score-f'; }
+
+                let html = '<div class="score-badge ' + cls + '">Score: ' + score + '/100 (Grade: ' + grade + ')</div>';
+                html += '<p style="color:#b0b0d0;margin:0.5rem 0">' + total + ' violation' + (total !== 1 ? 's' : '') + ' found</p>';
+
+                const impactOrder = ['critical','serious','moderate','minor','unknown'];
+                const impactColors = { critical: '#ff5050', serious: '#ff8c00', moderate: '#ffd700', minor: '#00d2ff', unknown: '#888' };
+                impactOrder.forEach(imp => {
+                    if (!impacts[imp]) return;
+                    html += '<p style="color:' + impactColors[imp] + ';margin:0.3rem 0;font-weight:600">' +
+                        imp.charAt(0).toUpperCase() + imp.slice(1) + ': ' + impacts[imp] + '</p>';
+                });
+
+                if (v.length > 0) {
+                    html += '<details style="margin-top:1rem"><summary style="color:#ffd700;cursor:pointer">View details</summary>';
+                    v.slice(0, 20).forEach(x => {
+                        html += '<div style="margin:0.5rem 0;padding:0.5rem;background:rgba(255,255,255,0.03);border-radius:8px">';
+                        html += '<strong style="color:' + (impactColors[x.impact]||'#888') + '">' + (x.impact||'?') + '</strong> ';
+                        html += '<span style="color:#00d2ff">' + (x.id||'') + '</span><br>';
+                        html += '<span style="color:#888;font-size:0.8rem">' + (x.help||'') + '</span>';
+                        if (x.nodes && x.nodes.length > 0) {
+                            html += '<br><span style="color:#606080;font-size:0.75rem">' + x.nodes.length + ' element(s) affected</span>';
+                        }
+                        html += '</div>';
+                    });
+                    html += '</details>';
+                }
+
+                resultDiv.innerHTML = html;
+            })
+            .catch(err => {
+                resultDiv.innerHTML = '<p style="color:#ff5050">Error: ' + err.message + '</p>';
+            });
+    }
+    </script>
+</body>
+</html>

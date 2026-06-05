@@ -3,10 +3,19 @@ import json
 import tempfile
 import os
 from fastapi import FastAPI, HTTPException, Query
+from fastapi.responses import FileResponse, HTMLResponse
 from pydantic import BaseModel
 import uvicorn
+from pdf_report import generate_audit_pdf
 
 app = FastAPI(title="AuditBot API")
+
+# Serve the landing page
+@app.get("/", response_class=HTMLResponse)
+async def root():
+    html_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "index.html")
+    with open(html_path, "r") as f:
+        return HTMLResponse(content=f.read())
 
 class AuditRequest(BaseModel):
     url: str
@@ -79,6 +88,29 @@ async def audit_post(request: AuditRequest):
 @app.get("/health")
 async def health():
     return {"status": "ok"}
+
+
+@app.get("/audit/report")
+async def audit_report_get(url: str = Query(..., description="URL to audit")):
+    """Run audit and return a professional PDF report as download."""
+    audit_data = run_axe_audit(url)
+    pdf_path = generate_audit_pdf(audit_data, url=url)
+    if not pdf_path:
+        raise HTTPException(status_code=500, detail="Failed to generate PDF report")
+    filename = os.path.basename(pdf_path)
+    return FileResponse(pdf_path, media_type="application/pdf", filename=filename)
+
+
+@app.post("/audit/report")
+async def audit_report_post(request: AuditRequest):
+    """Run audit and return a professional PDF report as download."""
+    audit_data = run_axe_audit(request.url)
+    pdf_path = generate_audit_pdf(audit_data, url=request.url)
+    if not pdf_path:
+        raise HTTPException(status_code=500, detail="Failed to generate PDF report")
+    filename = os.path.basename(pdf_path)
+    return FileResponse(pdf_path, media_type="application/pdf", filename=filename)
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
