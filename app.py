@@ -7,6 +7,7 @@ from fastapi.responses import FileResponse, HTMLResponse
 from pydantic import BaseModel
 import uvicorn
 from pdf_report import generate_audit_pdf
+from accessibility_scraper import get_accessibility_violations
 
 app = FastAPI(title="AuditBot API")
 
