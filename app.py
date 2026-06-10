@@ -79,11 +79,19 @@ def run_axe_audit(url: str) -> dict:
 
 @app.get("/audit")
 async def audit_get(url: str = Query(..., description="URL a auditar")):
-    return run_axe_audit(url)
+    axe_results = await run_axe_audit(url)
+    acc_violations = await get_accessibility_violations(url)
+    
+    axe_results["accessibility_violations"] = acc_violations
+    return axe_results
 
 @app.post("/audit")
 async def audit_post(request: AuditRequest):
-    return run_axe_audit(request.url)
+    axe_results = await run_axe_audit(request.url)
+    acc_violations = await get_accessibility_violations(request.url)
+    
+    axe_results["accessibility_violations"] = acc_violations
+    return axe_results
 
 @app.get("/health")
 async def health():
@@ -93,8 +101,13 @@ async def health():
 @app.get("/audit/report")
 async def audit_report_get(url: str = Query(..., description="URL to audit")):
     """Run audit and return a professional PDF report as download."""
-    audit_data = run_axe_audit(url)
-    pdf_path = generate_audit_pdf(audit_data, url=url)
+    axe_results = await run_axe_audit(url)
+    acc_violations = await get_accessibility_violations(url)
+    
+    # Merge data for report
+    axe_results["accessibility_violations"] = acc_violations
+    
+    pdf_path = generate_audit_pdf(axe_results, url=url)
     if not pdf_path:
         raise HTTPException(status_code=500, detail="Failed to generate PDF report")
     filename = os.path.basename(pdf_path)
@@ -104,8 +117,13 @@ async def audit_report_get(url: str = Query(..., description="URL to audit")):
 @app.post("/audit/report")
 async def audit_report_post(request: AuditRequest):
     """Run audit and return a professional PDF report as download."""
-    audit_data = run_axe_audit(request.url)
-    pdf_path = generate_audit_pdf(audit_data, url=request.url)
+    axe_results = await run_axe_audit(request.url)
+    acc_violations = await get_accessibility_violations(request.url)
+    
+    # Merge data for report
+    axe_results["accessibility_violations"] = acc_violations
+
+    pdf_path = generate_audit_pdf(axe_results, url=request.url)
     if not pdf_path:
         raise HTTPException(status_code=500, detail="Failed to generate PDF report")
     filename = os.path.basename(pdf_path)
