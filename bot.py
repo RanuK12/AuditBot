@@ -4,12 +4,10 @@ import asyncio
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 from app import run_audit  # Importamos la función principal de auditoría
+from logger_config import setup_logging
 
-# Configurar logging
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.INFO
-)
+# Configurar logging centralizado
+setup_logging()
 logger = logging.getLogger(__name__)
 
 # Token del bot desde variable de entorno

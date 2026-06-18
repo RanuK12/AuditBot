@@ -1,5 +1,10 @@
 import asyncio
+import logging
 from playwright.async_api import async_playwright
+from logger_config import setup_logging
+
+setup_logging()
+logger = logging.getLogger(__name__)
 
 async def get_accessibility_violations(url: str) -> list:
     """
@@ -29,7 +34,7 @@ async def get_accessibility_violations(url: str) -> list:
             violations.extend(buttons_without_label)
 
         except Exception as e:
-            print(f"Error scraping {url}: {e}")
+            logger.error(f"Error scraping {url}: {e}")
         finally:
             await browser.close()
             
