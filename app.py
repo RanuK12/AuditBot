@@ -7,8 +7,8 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import FileResponse, HTMLResponse
 from pydantic import BaseModel
 import uvicorn
-from pdf_report import generate_audit_pdf
-from accessibility_scraper import get_accessibility_violations
+from pdf_report import generate_pdf_report as generate_audit_pdf
+from accessibility_scraper import scrape_site as get_accessibility_violations
 
 app = FastAPI(title="AuditBot API")
 
