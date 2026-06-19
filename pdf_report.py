@@ -25,13 +25,16 @@ def _compute_summary(violations: List[Dict[str, Any]]) -> Dict[str, Any]:
         return {"total": 0, "by_impact": {}, "total_nodes": 0, "score": 100, "grade": "A+", "status": "Excellent"}
     by_impact: Dict[str, int] = {}
     total_nodes = 0
+    penalties = 0.0
+    weights = {"critical": 10, "serious": 5, "moderate": 2, "minor": 1, "unknown": 0.5}
     for v in violations:
         impact = v.get("impact", "unknown")
         by_impact[impact] = by_impact.get(impact, 0) + 1
-        total_nodes += len(v.get("nodes", []))
-    # Penalty weights per impact
-    weights = {"critical": 10, "serious": 5, "moderate": 2, "minor": 1, "unknown": 0.5}
-    penalties = sum(weights.get(impact, 0.5) for impact in by_impact)
+        nodes = v.get("nodes", [])
+        total_nodes += len(nodes)
+        # penalty per node
+        weight = weights.get(impact, 0.5)
+        penalties += weight * len(nodes)
     score = max(0, 100 - penalties)
     # Grade mapping
     if score >= 90:
