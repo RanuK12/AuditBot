@@ -2,7 +2,7 @@ import os
 import asyncio
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
-from app import run_audit
+from app import run_axe_audit as run_audit
 from logger_config import logger
 
 # Token del bot desde variable de entorno
