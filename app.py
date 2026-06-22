@@ -1,3 +1,4 @@
+import asyncio
 import subprocess
 import json
 import tempfile
@@ -43,7 +44,8 @@ def run_axe_audit(url: str) -> dict:
 
     try:
         command = f"npx axe {url} --save {output_path} --quiet"
-        result = subprocess.run(
+        result = await asyncio.to_thread(
+            subprocess.run,
             command,
             shell=True,
             capture_output=True,
