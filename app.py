@@ -1,3 +1,4 @@
+import asyncio
 import subprocess
 import json
 import tempfile
@@ -36,19 +37,16 @@ def validate_url(url: str) -> str:
         raise HTTPException(status_code=400, detail=f"Invalid domain: '{parsed.netloc}'")
     return url
 
-def run_axe_audit(url: str) -> dict:
+async def run_axe_audit(url: str) -> dict:
     url = validate_url(url)
     with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
         output_path = f.name
 
     try:
         command = f"npx axe {url} --save {output_path} --quiet"
-        result = subprocess.run(
-            command,
-            shell=True,
-            capture_output=True,
-            text=True,
-            timeout=120
+        result = await asyncio.to_thread(
+            subprocess.run, command,
+            shell=True, capture_output=True, text=True, timeout=120
         )
 
         if result.returncode != 0 and not os.path.exists(output_path):
