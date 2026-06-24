@@ -7,3 +7,15 @@
 2026-06-22 13:39:26,430 - httpx - INFO - HTTP Request: GET http://testserver/audit/report?url=https://example.org "HTTP/1.1 200 OK"
 2026-06-23 17:26:42,325 - httpx - INFO - HTTP Request: GET http://testserver/audit/report?url=https://example.com "HTTP/1.1 200 OK"
 2026-06-23 17:26:42,336 - httpx - INFO - HTTP Request: GET http://testserver/audit/report?url=https://example.org "HTTP/1.1 200 OK"
+2026-06-23 17:28:07,712 - httpx - INFO - HTTP Request: GET http://testserver/audit/report?url=https://example.com "HTTP/1.1 200 OK"
+2026-06-23 17:28:07,724 - httpx - INFO - HTTP Request: GET http://testserver/audit/report?url=https://example.org "HTTP/1.1 200 OK"
+2026-06-24 15:26:08,819 - root - INFO - Command /start received from user 12345
+2026-06-24 15:26:08,833 - root - INFO - Command /help received from user 12345
+2026-06-24 15:26:08,845 - root - INFO - Command /status received from user 12345
+2026-06-24 15:26:08,856 - root - INFO - Command /status received from user 12345
+2026-06-24 15:26:08,867 - root - INFO - URL received from user 12345: not-a-url
+2026-06-24 15:26:08,879 - root - INFO - URL received from user 12345: https://example.com
+2026-06-24 15:26:08,891 - root - INFO - URL received from user 12345: https://example.com
+2026-06-24 15:26:08,892 - root - ERROR - Error auditing https://example.com: Connection failed
+2026-06-24 15:26:13,250 - httpx - INFO - HTTP Request: GET http://testserver/audit/report?url=https://example.com "HTTP/1.1 200 OK"
+2026-06-24 15:26:13,265 - httpx - INFO - HTTP Request: GET http://testserver/audit/report?url=https://example.org "HTTP/1.1 200 OK"
