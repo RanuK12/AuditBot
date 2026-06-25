@@ -1,8 +1,10 @@
 import os
 import asyncio
+import tempfile
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 from app import run_axe_audit as run_audit
+from pdf_report import generate_pdf_report
 from logger_config import logger
 
 # Token del bot desde variable de entorno
@@ -104,6 +106,62 @@ async def handle_url(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
 
+async def report_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Maneja el comando /report <url>"""
+    logger.info(f"Command /report received from user {update.effective_user.id}")
+    # Extract URL from command arguments
+    if not context.args:
+        await update.message.reply_text(
+            "❌ Debes proporcionar una URL.\n"
+            "Ejemplo: /report https://ejemplo.com"
+        )
+        return
+    url = context.args[0].strip()
+    # Validate URL format
+    if not (url.startswith("http://") or url.startswith("https://")):
+        await update.message.reply_text(
+            "❌ La URL debe comenzar con http:// o https://\n"
+            "Por favor, envíame una URL válida."
+        )
+        return
+    # Notify user that audit is starting
+    await update.message.reply_text(f"🔍 Iniciando auditoría de {url}...\nEsto puede tomar unos segundos.")
+    try:
+        # Run the audit (this is async)
+        result = await run_audit(url)
+        # Store result for status tracking
+        audit_results[url] = update.effective_user.id
+        # Generate PDF report
+        try:
+            # Use a temporary file to hold the PDF
+            with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp:
+                pdf_path = tmp.name
+                # generate_pdf_report expects violations list and optional output_path
+                # It returns the path to the generated file
+                generate_pdf_report(result.get("violations", []), output_path=pdf_path)
+            # Send the PDF file to the user
+            with open(pdf_path, "rb") as pdf_file:
+                await update.message.reply_document(
+                    document=pdf_file,
+                    filename=f"audit_{url.replace('https://','').replace('http://','').replace('/','_')}.pdf",
+                    caption=f"📄 Reporte de accesibilidad para {url}"
+                )
+            # Clean up the temporary file
+            os.unlink(pdf_path)
+        except Exception as e:
+            logger.error(f"Error generating PDF for {url}: {e}")
+            await update.message.reply_text(
+                f"❌ Ocurrió un error al generar el PDF para {url}.\n"
+                "Por favor, intenta de nuevo más tarde."
+            )
+    except Exception as e:
+        logger.error(f"Error auditing {url}: {e}")
+        await update.message.reply_text(
+            f"❌ Ocurrió un error al auditar {url}.\n"
+            "Por favor, verifica que la URL sea accesible e intenta de nuevo."
+        )
+
+
 def main():
     """Punto de entrada principal del bot"""
     if not TOKEN:
@@ -115,6 +173,7 @@ def main():
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("help", help_command))
     application.add_handler(CommandHandler("status", status))
+    application.add_handler(CommandHandler("report", report_command))
     # Register message handler for URLs (non-command messages)
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_url))
     # Start polling

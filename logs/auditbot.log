@@ -19,3 +19,13 @@
 2026-06-24 15:26:08,892 - root - ERROR - Error auditing https://example.com: Connection failed
 2026-06-24 15:26:13,250 - httpx - INFO - HTTP Request: GET http://testserver/audit/report?url=https://example.com "HTTP/1.1 200 OK"
 2026-06-24 15:26:13,265 - httpx - INFO - HTTP Request: GET http://testserver/audit/report?url=https://example.org "HTTP/1.1 200 OK"
+2026-06-24 15:26:59,789 - root - INFO - Command /start received from user 12345
+2026-06-24 15:26:59,802 - root - INFO - Command /help received from user 12345
+2026-06-24 15:26:59,813 - root - INFO - Command /status received from user 12345
+2026-06-24 15:26:59,825 - root - INFO - Command /status received from user 12345
+2026-06-24 15:26:59,836 - root - INFO - URL received from user 12345: not-a-url
+2026-06-24 15:26:59,848 - root - INFO - URL received from user 12345: https://example.com
+2026-06-24 15:26:59,861 - root - INFO - URL received from user 12345: https://example.com
+2026-06-24 15:26:59,861 - root - ERROR - Error auditing https://example.com: Connection failed
+2026-06-24 15:26:59,876 - httpx - INFO - HTTP Request: GET http://testserver/audit/report?url=https://example.com "HTTP/1.1 200 OK"
+2026-06-24 15:26:59,888 - httpx - INFO - HTTP Request: GET http://testserver/audit/report?url=https://example.org "HTTP/1.1 200 OK"
