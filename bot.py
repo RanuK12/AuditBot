@@ -23,7 +23,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "Comandos disponibles:\n"
         "/start - Iniciar el bot\n"
         "/help - Ayuda\n"
-        "/status - Ver estado de auditorías"
+        "/status - Ver estado de auditorías\n"
+        "/report <url> - Generar y descargar PDF de auditoría"
     )
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
