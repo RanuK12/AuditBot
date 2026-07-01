@@ -6,6 +6,7 @@ from fastapi.testclient import TestClient
 from unittest.mock import patch
 import tempfile
 import os
+import httpx
 
 def test_validate_url_valid():
     """Valid URLs should be accepted and normalized."""
@@ -96,3 +97,29 @@ def test_audit_report_endpoint():
                     assert response.content[:4] == b"%PDF"
 
     os.unlink(tmp_pdf.name)
+
+
+@pytest.mark.asyncio
+async def test_audit_get_basic():
+    """GET /audit?url=... should return 200 with url_ok, issues and score fields."""
+
+    async def mock_axe_audit(url):
+        return {"url": url, "totalViolations": 0, "violations": []}
+
+    async def mock_acc_violations(url):
+        return []
+
+    with patch("app.run_axe_audit", side_effect=mock_axe_audit):
+        with patch("app.get_accessibility_violations", side_effect=mock_acc_violations):
+            async with httpx.AsyncClient(
+                transport=httpx.ASGITransport(app=app), base_url="http://test"
+            ) as client:
+                response = await client.get("/audit", params={"url": "https://example.com"})
+                assert response.status_code == 200
+                data = response.json()
+                assert "url_ok" in data
+                assert "issues" in data
+                assert isinstance(data["issues"], list)
+                assert "score" in data
+                assert isinstance(data["score"], (int, float))
+                assert 0 <= data["score"] <= 100
