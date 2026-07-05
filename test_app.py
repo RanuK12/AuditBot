@@ -35,12 +35,12 @@ def test_validate_url_invalid():
     assert exc.value.status_code == 400
 
 
-def test_audit_report_returns_pdf():
+def test_audit_report_returns_pdf(tmp_path):
     """Test that /audit/report returns a PDF file."""
+    import os
     # Create a temporary PDF file to simulate generation
-    tmp_pdf = tempfile.NamedTemporaryFile(suffix=".pdf", delete=False)
-    tmp_pdf.write(b"%PDF-1.4 fake pdf content")
-    tmp_pdf.close()
+    tmp_pdf = tmp_path / "report.pdf"
+    tmp_pdf.write_bytes(b"%PDF-1.4 fake pdf content")
 
     async def mock_axe_audit(url):
         return {"url": url, "totalViolations": 0, "violations": []}
@@ -49,7 +49,15 @@ def test_audit_report_returns_pdf():
         return []
 
     def mock_generate_pdf(data, url):
-        return tmp_pdf.name
+        return str(tmp_pdf)
+
+    with patch("app.run_axe_audit", side_effect=mock_axe_audit):
+        with patch("app.get_accessibility_violations", side_effect=mock_acc_violations):
+            with patch("app.generate_pdf", side_effect=mock_generate_pdf):
+                with TestClient(app) as client:
+                    response = client.get("/audit/report?url=https://accessible-site.com")
+                    assert response.status_code == 200
+                    assert response.headers["content-type"] == "application/pdf"
 
     with patch("app.run_axe_audit", side_effect=mock_axe_audit):
         with patch("app.get_accessibility_violations", side_effect=mock_acc_violations):
