@@ -8,6 +8,34 @@ import tempfile
 import os
 import httpx
 
+
+# ──────────────────────────────────────────────────────────────
+# Root & Health endpoint tests
+# ──────────────────────────────────────────────────────────────
+
+def test_root_returns_html():
+    """GET / should return 200 with HTML content-type."""
+    with TestClient(app) as client:
+        response = client.get("/")
+        assert response.status_code == 200
+        assert "text/html" in response.headers["content-type"]
+        assert len(response.text) > 0
+
+
+def test_health_returns_ok():
+    """GET /health should return 200 with a status field."""
+    with TestClient(app) as client:
+        response = client.get("/health")
+        assert response.status_code == 200
+        data = response.json()
+        assert "status" in data
+        assert data["status"].lower() in ("ok", "healthy", "up")
+
+
+# ──────────────────────────────────────────────────────────────
+# URL validation tests
+# ──────────────────────────────────────────────────────────────
+
 def test_validate_url_valid():
     """Valid URLs should be accepted and normalized."""
     assert validate_url("https://example.com") == "https://example.com"
@@ -15,6 +43,7 @@ def test_validate_url_valid():
     assert validate_url("example.com") == "https://example.com"
     assert validate_url("https://example.com/path?q=1") == "https://example.com/path?q=1"
     assert validate_url("localhost") == "https://localhost"
+
 
 def test_validate_url_invalid():
     """Invalid URLs should raise HTTPException 400."""
@@ -37,7 +66,6 @@ def test_validate_url_invalid():
 
 def test_audit_report_returns_pdf():
     """Test that /audit/report returns a PDF file."""
-    # Create a temporary PDF file to simulate generation
     tmp_pdf = tempfile.NamedTemporaryFile(suffix=".pdf", delete=False)
     tmp_pdf.write(b"%PDF-1.4 fake pdf content")
     tmp_pdf.close()
@@ -58,10 +86,8 @@ def test_audit_report_returns_pdf():
                     response = client.get("/audit/report?url=https://example.com")
                     assert response.status_code == 200
                     assert response.headers["content-type"] == "application/pdf"
-                    # Verify PDF magic bytes
                     assert response.content[:4] == b"%PDF"
 
-    # Clean up temporary file
     os.unlink(tmp_pdf.name)
 
 
