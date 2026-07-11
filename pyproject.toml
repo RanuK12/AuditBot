@@ -34,12 +34,9 @@ Documentation = "https://github.com/RanuK12/auditbot#readme"
 Repository = "https://github.com/RanuK12/auditbot"
 Issues = "https://github.com/RanuK12/auditbot/issues"
 
-[tool.setuptools]
-packages = ["auditbot"]
-python-source = ["auditbot"]
-
 [tool.setuptools.packages.find]
 where = [""]
+include = ["auditbot*", "tests*"]
 
 [project.scripts]
 auditbot = "auditbot.app:main"
