@@ -59,3 +59,15 @@
 2026-06-26 13:03:22,347 - root - INFO - URL received from user 12345: https://example.com
 2026-06-26 13:03:22,360 - root - INFO - URL received from user 12345: https://example.com
 2026-06-26 13:03:22,361 - root - ERROR - Error auditing https://example.com: Connection failed
+2026-07-26 08:28:42,944 - httpx - INFO - HTTP Request: GET http://testserver/ "HTTP/1.1 200 OK"
+2026-07-26 08:28:42,952 - httpx - INFO - HTTP Request: GET http://testserver/health "HTTP/1.1 200 OK"
+2026-07-26 08:28:42,966 - httpx - INFO - HTTP Request: GET http://testserver/audit/report?url=https://example.com "HTTP/1.1 200 OK"
+2026-07-26 08:28:42,977 - httpx - INFO - HTTP Request: GET http://testserver/audit/report?url=https://example.org "HTTP/1.1 200 OK"
+2026-07-26 08:28:42,989 - httpx - INFO - HTTP Request: GET http://testserver/audit?url=https://example.com "HTTP/1.1 200 OK"
+2026-07-26 08:28:43,106 - httpx - INFO - HTTP Request: POST http://testserver/audit "HTTP/1.1 200 OK"
+2026-07-26 08:28:43,135 - httpx - INFO - HTTP Request: GET http://testserver/audit?url=not-a-valid-url "HTTP/1.1 400 Bad Request"
+2026-07-26 08:28:43,141 - httpx - INFO - HTTP Request: POST http://testserver/audit "HTTP/1.1 400 Bad Request"
+2026-07-26 08:28:43,148 - httpx - INFO - HTTP Request: GET http://testserver/audit "HTTP/1.1 422 Unprocessable Entity"
+2026-07-26 08:28:43,155 - httpx - INFO - HTTP Request: GET http://testserver/audit?url=https://example.com "HTTP/1.1 500 Internal Server Error"
+2026-07-26 08:28:43,161 - httpx - INFO - HTTP Request: GET http://testserver/audit?url=example.com "HTTP/1.1 200 OK"
+2026-07-26 08:28:43,168 - httpx - INFO - HTTP Request: GET http://testserver/audit?url=https://accessible-site.com "HTTP/1.1 200 OK"
