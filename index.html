@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AI-powered website accessibility audit tool. Run WCAG 2.1 AA compliance checks, compare sites, and download professional PDF reports.">
     <title>AuditBot - AI-Powered Website Audit & Comparison</title>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%2300d2ff'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Arial,sans-serif' font-weight='bold' font-size='18' fill='white'%3EA%3C/text%3E%3C/svg%3E" />
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
-        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);color:#fff;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);color:#fff;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:2rem;padding-bottom:2rem}
         .container{max-width:900px;padding:2rem;text-align:center}
         h1{font-size:clamp(2rem,5vw,3.5rem);font-weight:800;line-height:1.15;margin-bottom:1rem;background:linear-gradient(90deg,#00d2ff,#3a7bd5);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-shadow:0 0 40px rgba(0,210,255,0.3)}
 .subtitle{font-size:1.2rem;color:#ffffff;margin-bottom:2.5rem;line-height:1.6;max-width:600px;margin-left:auto;margin-right:auto}
@@ -45,6 +46,7 @@
         @keyframes spin{to{transform:rotate(360deg)}}
         .cta-button{display:inline-block;padding:1rem 2.5rem;font-size:1.1rem;font-weight:600;color:#fff;background:linear-gradient(90deg,#00d2ff,#3a7bd5);border:none;border-radius:50px;cursor:pointer;text-decoration:none;transition:transform 0.3s,box-shadow 0.3s;margin-top:1.5rem}
         .cta-button:hover{transform:scale(1.05);box-shadow:0 10px 30px rgba(0,210,255,0.3)}
+        .cta-button:active{transform:scale(0.97)}
         .cta-secondary{background:transparent;border:2px solid rgba(0,210,255,0.4);margin-left:1rem}
 .cta-button:focus-visible,.btn-json:focus-visible{outline:2px solid #00d2ff;outline-offset:3px}
         /* Code / API section */
@@ -69,24 +71,20 @@
         .api-section code{background:rgba(0,210,255,0.1);padding:0.2rem 0.5rem;border-radius:6px;font-size:0.85rem;color:#b0d0ff}
         .api-section pre{background:rgba(0,0,0,0.3);padding:1rem;border-radius:10px;overflow-x:auto;margin:0.8rem 0;font-size:0.8rem;color:#c0c0e0}
         footer{margin-top:3rem;font-size:0.8rem;color:#606080}
-    @media(max-width:600px){h1{text-shadow:0 0 20px rgba(0,210,255,0.2)}.features{grid-template-columns:1fr}.steps{flex-direction:column;align-items:center}.step-card{max-width:100%}.container{padding:1rem}.cta-button{padding:0.8rem 1.5rem;font-size:1rem;display:block;margin:0.5rem auto}.cta-secondary{margin-left:0}.btn-row{flex-direction:column}.btn-row .btn{width:100%;text-align:center}}
-    </style>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        @media (max-width: 768px) {
-            .container {
-                padding: 1rem;
-            }
-            .features {
-                grid-template-columns: 1fr;
-            }
-            .audit-form {
-                padding: 1rem;
-            }
-            .audit-form .btn-row {
-                flex-direction: column;
-            }
-        }
+    @media(max-width:600px){
+        .container{padding:1rem}
+        h1{font-size:clamp(1.5rem,6vw,2.5rem)}
+        .subtitle{font-size:1rem}
+        .feature-card{padding:1rem}
+        .audit-form{padding:1rem}
+        .btn-row{flex-direction:column}
+        .features{grid-template-columns:1fr}
+        .steps{flex-direction:column;align-items:center}
+        .step-card{max-width:100%}
+        .cta-button{padding:0.8rem 1.5rem;font-size:1rem;display:block;margin:0.5rem auto}
+        .cta-secondary{margin-left:0}
+        .btn-row .btn{width:100%;text-align:center}
+    }
     </style>
 </head>
 <body>
