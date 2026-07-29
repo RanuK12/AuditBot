@@ -47,13 +47,18 @@
         .cta-button:hover{transform:scale(1.05);box-shadow:0 10px 30px rgba(0,210,255,0.3)}
         .cta-secondary{background:transparent;border:2px solid rgba(0,210,255,0.4);margin-left:1rem}
 .cta-button:focus-visible,.btn-json:focus-visible{outline:2px solid #00d2ff;outline-offset:3px}
+        /* Code / API section */
+        .api-section{margin:2rem 0;text-align:left}
+        .api-section h2{font-size:1.1rem;color:#ffd700;margin:1.2rem 0 0.5rem}
+        .api-section h2:first-child{margin-top:0}
+        .api-section pre{background:#0d1117;border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:1rem 1.2rem;font-family:'SF Mono','Fira Code','Cascadia Code',monospace;font-size:0.82rem;color:#a0c0e0;overflow-x:auto;line-height:1.6;position:relative}
+        .api-section pre::before{content:'$ ';color:#00d2ff;user-select:none}
 .btn-pdf:focus-visible{outline:2px solid #ffd700;outline-offset:3px}
 .cta-secondary:focus-visible{outline:2px solid #00d2ff;outline-offset:3px}
         .status{margin-top:2rem;padding:1rem 2rem;background:rgba(0,210,255,0.1);border:1px solid rgba(0,210,255,0.3);border-radius:12px;display:inline-block}
         .status-dot{width:10px;height:10px;background:#00ff88;border-radius:50%;display:inline-block;margin-right:0.5rem;animation:pulse 2s infinite}
         @keyframes pulse{0%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(1.2)}100%{opacity:1;transform:scale(1)}}
-@media(max-width:600px){.container{padding:1rem}.features{grid-template-columns:1fr}h1{font-size:clamp(1.5rem,6vw,2.5rem)}.subtitle{font-size:1rem}.btn-row{flex-direction:column}.btn-row .btn{width:100%}.cta-button{padding:0.8rem 1.5rem;font-size:1rem}.steps{gap:0.8rem}}
-        .steps{display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap;margin-bottom:1rem}
+.steps{display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap;margin-bottom:1rem}
         .step-card{background:rgba(255,255,255,0.05);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:1.5rem;text-align:center;flex:1;min-width:200px;max-width:280px;transition:transform 0.3s,box-shadow 0.3s}
         .step-card:hover{transform:translateY(-5px);box-shadow:0 10px 30px rgba(0,210,255,0.15)}
         .step-number{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#00d2ff,#3a7bd5);color:#fff;font-size:1.5rem;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto 0.8rem}
@@ -64,8 +69,6 @@
         .api-section code{background:rgba(0,210,255,0.1);padding:0.2rem 0.5rem;border-radius:6px;font-size:0.85rem;color:#b0d0ff}
         .api-section pre{background:rgba(0,0,0,0.3);padding:1rem;border-radius:10px;overflow-x:auto;margin:0.8rem 0;font-size:0.8rem;color:#c0c0e0}
         footer{margin-top:3rem;font-size:0.8rem;color:#606080}
-    @media(max-width:600px){h1{text-shadow:0 0 20px rgba(0,210,255,0.2)}.features{grid-template-columns:1fr}.steps{flex-direction:column;align-items:center}.step-card{max-width:100%}.container{padding:1rem}.cta-button{padding:0.8rem 1.5rem;font-size:1rem;display:block;margin:0.5rem auto}.cta-secondary{margin-left:0}.btn-row{flex-direction:column}.btn-row .btn{width:100%;text-align:center}}
-    @media(max-width:600px){.container{padding:1rem}.features{grid-template-columns:1fr}h1{font-size:clamp(1.5rem,6vw,2.5rem)}.subtitle{font-size:1rem}.btn-row{flex-direction:column}.btn-row .btn{width:100%}.cta-button{padding:0.8rem 1.5rem;font-size:1rem}.steps{gap:0.8rem}}
     @media(max-width:600px){h1{text-shadow:0 0 20px rgba(0,210,255,0.2)}.features{grid-template-columns:1fr}.steps{flex-direction:column;align-items:center}.step-card{max-width:100%}.container{padding:1rem}.cta-button{padding:0.8rem 1.5rem;font-size:1rem;display:block;margin:0.5rem auto}.cta-secondary{margin-left:0}.btn-row{flex-direction:column}.btn-row .btn{width:100%;text-align:center}}
     </style>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
