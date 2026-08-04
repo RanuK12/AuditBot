@@ -5,6 +5,7 @@ from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 from app import run_axe_audit as run_audit
 from pdf_report import generate_pdf_report
+from report_transformer import transform_axe_to_report_format
 from logger_config import logger
 
 # Token del bot desde variable de entorno
@@ -24,7 +25,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "/start - Iniciar el bot\n"
         "/help - Ayuda\n"
         "/status - Ver estado de auditorías\n"
-        "/report <url> - Generar y descargar PDF de auditoría"
+        "/report <url> - Generar y descargar PDF de auditoría\n"
+        "/compatible <url> - Generar reporte compatible con ADA-AUDITS (formato generate_report.py)"
     )
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -40,7 +42,9 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "**Comandos:**\n"
         "/start - Iniciar el bot\n"
         "/help - Mostrar esta ayuda\n"
-        "/status - Ver estado de auditorías activas"
+        "/status - Ver estado de auditorías activas\n"
+        "/report <url> - Generar y descargar PDF de auditoría\n"
+        "/compatible <url> - Generar reporte compatible con ADA-AUDITS (formato generate_report.py)"
     )
 
 async def status(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -163,6 +167,65 @@ async def report_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
 
+async def compatible_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Maneja el comando /compatible <url> para generar reporte compatible con ADA-AUDITS"""
+    logger.info(f"Command /compatible received from user {update.effective_user.id}")
+    # Extract URL from command arguments
+    if not context.args:
+        await update.message.reply_text(
+            "❌ Debes proporcionar una URL.\n"
+            "Ejemplo: /compatible https://ejemplo.com"
+        )
+        return
+    url = context.args[0].strip()
+    # Validate URL format
+    if not (url.startswith("http://") or url.startswith("https://")):
+        await update.message.reply_text(
+            "❌ La URL debe comenzar con http:// o https://\n"
+            "Por favor, envíame una URL válida."
+        )
+        return
+    # Notify user that audit is starting
+    await update.message.reply_text(f"🔍 Iniciando auditoría de {url} para generar reporte compatible con ADA-AUDITS...\nEsto puede tomar unos segundos.")
+    try:
+        # Run the audit (this is async)
+        result = await run_audit(url)
+        # Store result for status tracking
+        audit_results[url] = update.effective_user.id
+        # Generate report compatible with ADA-AUDITS format
+        try:
+            # Use a temporary file to hold the report
+            with tempfile.NamedTemporaryFile(mode='w', suffix=".json", delete=False, encoding='utf-8') as tmp:
+                report_path = tmp.name
+                # Transform the audit result to ADA-AUDITS format
+                transformed_report = transform_axe_to_report_format(result)
+                # Write the JSON report
+                import json
+                json.dump(transformed_report, tmp, indent=2, ensure_ascii=False)
+            
+            # Send the JSON report to the user
+            with open(report_path, "rb") as report_file:
+                await update.message.reply_document(
+                    document=report_file,
+                    filename=f"audit_compatible_{url.replace('https://','').replace('http://','').replace('/','_')}.json",
+                    caption=f"📄 Reporte de accesibilidad compatible con ADA-AUDITS para {url}"
+                )
+            # Clean up the temporary file
+            os.unlink(report_path)
+        except Exception as e:
+            logger.error(f"Error generating compatible report for {url}: {e}")
+            await update.message.reply_text(
+                f"❌ Ocurrió un error al generar el reporte compatible para {url}.\n"
+                "Por favor, intenta de nuevo más tarde."
+            )
+    except Exception as e:
+        logger.error(f"Error auditing {url}: {e}")
+        await update.message.reply_text(
+            f"❌ Ocurrió un error al auditar {url}.\n"
+            "Por favor, verifica que la URL sea accesible e intenta de nuevo."
+        )
+
+
 def main():
     """Punto de entrada principal del bot"""
     if not TOKEN:
@@ -175,6 +238,7 @@ def main():
     application.add_handler(CommandHandler("help", help_command))
     application.add_handler(CommandHandler("status", status))
     application.add_handler(CommandHandler("report", report_command))
+    application.add_handler(CommandHandler("compatible", compatible_command))
     # Register message handler for URLs (non-command messages)
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_url))
     # Start polling
