@@ -38,6 +38,13 @@ Issues = "https://github.com/RanuK12/auditbot/issues"
 where = [""]
 include = ["auditbot*", "tests*"]
 
+[project.optional-dependencies]
+test = [
+    "pytest>=7.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.0",
+]
+
 [project.scripts]
 auditbot = "auditbot.app:main"
 

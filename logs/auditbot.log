@@ -59,3 +59,7 @@
 2026-06-26 13:03:22,347 - root - INFO - URL received from user 12345: https://example.com
 2026-06-26 13:03:22,360 - root - INFO - URL received from user 12345: https://example.com
 2026-06-26 13:03:22,361 - root - ERROR - Error auditing https://example.com: Connection failed
+2026-08-04 20:53:17,795 - root - ERROR - Unexpected error scraping https://example.com: TypeError: 'coroutine' object does not support the asynchronous context manager protocol (missed __aexit__ method)
+2026-08-04 20:53:17,796 - root - INFO - Finished scraping for URL: https://example.com
+2026-08-04 21:54:35,054 - root - ERROR - Unexpected error scraping https://example.com: TypeError: 'coroutine' object does not support the asynchronous context manager protocol (missed __aexit__ method)
+2026-08-04 21:54:35,055 - root - INFO - Finished scraping for URL: https://example.com

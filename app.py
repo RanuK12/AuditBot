@@ -10,6 +10,7 @@ from pydantic import BaseModel
 import uvicorn
 from pdf_report import generate_pdf_report as generate_audit_pdf
 from accessibility_scraper import scrape_site as get_accessibility_violations
+from report_transformer import transform_axe_to_report_format
 
 app = FastAPI(title="AuditBot API")
 
@@ -132,3 +133,33 @@ async def audit_report_get(url: str = Query(..., description="URL to audit")):
         raise HTTPException(status_code=500, detail="Failed to generate PDF report")
     filename = os.path.basename(pdf_path)
     return FileResponse(pdf_path, media_type='application/pdf', filename=filename)
+
+@app.get("/audit/report/json")
+async def audit_report_json_get(url: str = Query(..., description="URL to audit")):
+    """Run audit and return a JSON report compatible with generate_report.py format."""
+    url = validate_url(url)
+    axe_results = await run_axe_audit(url)
+    acc_violations = await get_accessibility_violations(url)
+    
+    # Merge data for report
+    axe_results["accessibility_violations"] = acc_violations
+    
+    # Transform to ADA-AUDITS format
+    report_data = transform_axe_to_report_format(axe_results, url=url)
+    
+    return report_data
+
+@app.post("/audit/report/json")
+async def audit_report_json_post(request: AuditRequest):
+    """Run audit and return a JSON report compatible with generate_report.py format."""
+    url = validate_url(request.url)
+    axe_results = await run_axe_audit(url)
+    acc_violations = await get_accessibility_violations(url)
+    
+    # Merge data for report
+    axe_results["accessibility_violations"] = acc_violations
+    
+    # Transform to ADA-AUDITS format
+    report_data = transform_axe_to_report_format(axe_results, url=url)
+    
+    return report_data
