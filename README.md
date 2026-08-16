@@ -27,11 +27,36 @@ Para instalar Auditbot, sigue estos pasos:
 ## Uso Básico
 --------------
 
+### CLI
 Para realizar una auditoría básica de accesibilidad con Auditbot, sigue estos pasos:
 
-1.  Abre la terminal y navega al directorio del proyecto
-2.  Ejecuta el comando `npm run audit` seguido de la URL del sitio web que deseas auditar: `npm run audit https://example.com`
-3.  La herramienta generará un informe detallado sobre los problemas de accesibilidad encontrados en el sitio web
+1. Abre la terminal y navega al directorio del proyecto
+2. Ejecuta el comando `npm run audit` seguido de la URL del sitio web que deseas auditar: `npm run audit https://example.com`
+3. La herramienta generará un informe detallado sobre los problemas de accesibilidad encontrados en el sitio web
+
+
+### API REST
+Auditbot expone una API REST para integrar la auditoría en tus flujos de trabajo:
+
+#### Endpoints disponibles:
+- **POST `/trigger`**: Inicia una auditoría de accesibilidad a partir de una URL y devuelve el reporte en formato compatible con `generate_report.py`.
+  **Request body**:
+  ```json
+  {
+    "url": "https://example.com"
+  }
+  ```
+  **Response**: Reporte en formato JSON compatible con `generate_report.py`.
+
+- **GET `/audit?url=<url>`**: Ejecuta una auditoría y devuelve los resultados en formato JSON.
+- **POST `/audit`**: Igual que GET `/audit`, pero con el cuerpo JSON.
+- **GET `/audit/report?url=<url>`**: Genera y devuelve un informe PDF de la auditoría.
+- **GET/POST `/audit/report/json`**: Devuelve el reporte en formato JSON compatible con `generate_report.py`.
+
+Ejemplo de uso con `curl`:
+```bash
+curl -X POST http://localhost:8000/trigger -H "Content-Type: application/json" -d '{"url": "https://example.com"}'
+```
 
 ## Contribución
 --------------

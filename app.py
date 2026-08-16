@@ -163,3 +163,16 @@ async def audit_report_json_post(request: AuditRequest):
     report_data = transform_axe_to_report_format(axe_results, url=url)
     
     return report_data
+
+
+@app.post('/trigger')
+async def trigger_audit(request: AuditRequest):
+    """Inicia una auditoría accessibility a partir de una URL y devuelve el reporte en formato compatible con generate_report.py"""
+    url = validate_url(request.url)
+    axe_results = await run_axe_audit(url)
+    acc_violations = await get_accessibility_violations(url)
+    axe_results['accessibility_violations'] = acc_violations
+    
+    # Transform to ADA-AUDITS format
+    report_data = transform_axe_to_report_format(axe_results, url=url)
+    return report_data
