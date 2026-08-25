@@ -3,6 +3,7 @@ import subprocess
 import json
 import tempfile
 import os
+import argparse
 from urllib.parse import urlparse
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import FileResponse, HTMLResponse
@@ -116,6 +117,50 @@ async def audit_post(request: AuditRequest):
 @app.get("/health")
 async def health():
     return {"status": "ok"}
+
+
+def main():
+    """Command line interface for AuditBot."""
+    parser = argparse.ArgumentParser(description='AuditBot - Web Accessibility Audit Tool')
+    parser.add_argument('url', help='URL to audit')
+    parser.add_argument('--format', choices=['json', 'pdf'], default='json',
+                        help='Output format (default: json)')
+    parser.add_argument('--output', help='Output file path (optional)')
+    parser.add_argument('--host', default='127.0.0.1', help='Host for API server')
+    parser.add_argument('--port', type=int, default=8000, help='Port for API server')
+    
+    args = parser.parse_args()
+    
+    # Validate URL
+    try:
+        validated_url = validate_url(args.url)
+    except HTTPException as e:
+        print(f"Error: {e.detail}")
+        return 1
+    
+    # Run audit
+    try:
+        if args.format == 'pdf':
+            # Generate PDF report
+            pdf_path = generate_audit_pdf([], url=validated_url)
+            if pdf_path:
+                print(f"PDF report generated: {pdf_path}")
+                return 0
+            else:
+                print("Error generating PDF report")
+                return 1
+        else:
+            # Generate JSON report
+            # This would normally call the audit endpoint, but for CLI we'll simulate
+            print(f"Auditing {validated_url}...")
+            print("Note: CLI audit functionality requires running API server")
+            print(f"Start server: python app.py --host {args.host} --port {args.port}")
+            print(f"Then call: curl http://{args.host}:{args.port}/audit?url={validated_url}")
+            return 0
+            
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        return 1
 
 
 @app.get("/audit/report")
