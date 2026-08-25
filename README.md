@@ -30,8 +30,35 @@ Para instalar Auditbot, sigue estos pasos:
 Para realizar una auditoría básica de accesibilidad con Auditbot, sigue estos pasos:
 
 1.  Abre la terminal y navega al directorio del proyecto
-2.  Ejecuta el comando `npm run audit` seguido de la URL del sitio web que deseas auditar: `npm run audit https://example.com`
+2.  Ejecuta el comando de auditoría:
+    - Con npm: `npm run audit https://example.com`
+    - Con CLI directo: `python app.py https://example.com`
 3.  La herramienta generará un informe detallado sobre los problemas de accesibilidad encontrados en el sitio web
+
+## Uso de la Interfaz de Línea de Comandos (CLI)
+
+Auditbot también incluye una interfaz de línea de comandos para ejecutar auditorías directamente desde la terminal:
+
+```bash
+# Auditoría básica en formato JSON
+python app.py https://example.com
+
+# Auditoría con formato PDF
+python app.py https://example.com --format pdf
+
+# Especificar puerto y host para el servidor API
+python app.py https://example.com --host 127.0.0.1 --port 8000
+
+# Guardar resultado en archivo específico
+python app.py https://example.com --output report.json --format json
+```
+
+Parámetros disponibles:
+- `url`: URL del sitio web a auditar (obligatorio)
+- `--format`: Formato de salida (json o pdf, default: json)
+- `--output`: Ruta del archivo de salida (opcional)
+- `--host`: Host para el servidor API (default: 127.0.0.1)
+- `--port`: Puerto para el servidor API (default: 8000)
 
 ## Contribución
 --------------
