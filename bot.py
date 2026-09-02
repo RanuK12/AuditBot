@@ -192,32 +192,51 @@ async def compatible_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
         result = await run_audit(url)
         # Store result for status tracking
         audit_results[url] = update.effective_user.id
-        # Generate report compatible with ADA-AUDITS format
+        
+        # Generate markdown report using generate_report.py
         try:
-            # Use a temporary file to hold the report
-            with tempfile.NamedTemporaryFile(mode='w', suffix=".json", delete=False, encoding='utf-8') as tmp:
-                report_path = tmp.name
-                # Transform the audit result to ADA-AUDITS format
-                transformed_report = transform_axe_to_report_format(result)
-                # Write the JSON report
-                import json
-                json.dump(transformed_report, tmp, indent=2, ensure_ascii=False)
+            from generate_report import generate_report
+            markdown_report = generate_report(result, url)
             
-            # Send the JSON report to the user
-            with open(report_path, "rb") as report_file:
-                await update.message.reply_document(
-                    document=report_file,
-                    filename=f"audit_compatible_{url.replace('https://','').replace('http://','').replace('/','_')}.json",
-                    caption=f"📄 Reporte de accesibilidad compatible con ADA-AUDITS para {url}"
-                )
-            # Clean up the temporary file
-            os.unlink(report_path)
-        except Exception as e:
-            logger.error(f"Error generating compatible report for {url}: {e}")
+            # Send the markdown report as text
             await update.message.reply_text(
-                f"❌ Ocurrió un error al generar el reporte compatible para {url}.\n"
-                "Por favor, intenta de nuevo más tarde."
+                f"📄 **Reporte de accesibilidad compatible con ADA-AUDITS para {url}**\n\n"
+                f"```markdown\n{markdown_report}\n```"
             )
+        except Exception as e:
+            logger.error(f"Error generating markdown report for {url}: {e}")
+            # Fallback to JSON report if markdown fails
+            try:
+                # Use a temporary file to hold the report
+                with tempfile.NamedTemporaryFile(mode='w', suffix=".json", delete=False, encoding='utf-8') as tmp:
+                    report_path = tmp.name
+                    # Transform the audit result to ADA-AUDITS format
+                    transformed_report = transform_axe_to_report_format(result)
+                    # Write the JSON report
+                    import json
+                    json.dump(transformed_report, tmp, indent=2, ensure_ascii=False)
+                
+                # Send the JSON report to the user
+                with open(report_path, "rb") as report_file:
+                    await update.message.reply_document(
+                        document=report_file,
+                        filename=f"audit_compatible_{url.replace('https://','').replace('http://','').replace('/','_')}.json",
+                        caption=f"📄 Reporte de accesibilidad compatible con ADA-AUDITS para {url}"
+                    )
+                # Clean up the temporary file
+                os.unlink(report_path)
+            except Exception as fallback_error:
+                logger.error(f"Error generating fallback JSON report for {url}: {fallback_error}")
+                await update.message.reply_text(
+                    f"❌ Ocurrió un error al generar el reporte compatible para {url}.\n"
+                    "Por favor, intenta de nuevo más tarde."
+                )
+    except Exception as audit_error:
+        logger.error(f"Error running audit for {url}: {audit_error}")
+        await update.message.reply_text(
+            f"❌ Ocurrió un error al realizar la auditoría para {url}.\n"
+            "Por favor, verifica que la URL es correcta e intenta de nuevo más tarde."
+        )
     except Exception as e:
         logger.error(f"Error auditing {url}: {e}")
         await update.message.reply_text(
