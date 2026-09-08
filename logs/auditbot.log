@@ -63,3 +63,13 @@
 2026-08-04 20:53:17,796 - root - INFO - Finished scraping for URL: https://example.com
 2026-08-04 21:54:35,054 - root - ERROR - Unexpected error scraping https://example.com: TypeError: 'coroutine' object does not support the asynchronous context manager protocol (missed __aexit__ method)
 2026-08-04 21:54:35,055 - root - INFO - Finished scraping for URL: https://example.com
+2026-09-08 06:10:20,610 - root - INFO - Scraped 0 accessibility issues from https://example.com
+2026-09-08 06:10:20,612 - root - INFO - Finished scraping for URL: https://example.com
+2026-09-08 07:42:16,537 - root - INFO - Scraped 0 accessibility issues from https://example.com
+2026-09-08 07:42:16,539 - root - INFO - Finished scraping for URL: https://example.com
+2026-09-08 07:43:17,879 - root - INFO - Scraped 0 accessibility issues from https://example.com
+2026-09-08 07:43:17,881 - root - INFO - Finished scraping for URL: https://example.com
+2026-09-08 07:43:51,571 - root - INFO - Scraped 0 accessibility issues from https://example.com
+2026-09-08 07:43:51,573 - root - INFO - Finished scraping for URL: https://example.com
+2026-09-08 07:44:06,369 - root - INFO - Scraped 0 accessibility issues from https://example.com
+2026-09-08 07:44:06,371 - root - INFO - Finished scraping for URL: https://example.com

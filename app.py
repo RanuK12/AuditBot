@@ -40,59 +40,58 @@ def validate_url(url: str) -> str:
 
 async def run_axe_audit(url: str) -> dict:
     url = validate_url(url)
-    with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
-        output_path = f.name
-
     try:
-        command = f"npx axe {url} --save {output_path} --quiet"
+        command = f"npx axe {url} --stdout"
         result = await asyncio.to_thread(
             subprocess.run, command,
             shell=True, capture_output=True, text=True, timeout=120
         )
 
-        if result.returncode != 0 and not os.path.exists(output_path):
+        if result.returncode != 0:
             raise HTTPException(status_code=500, detail=f"Error ejecutando axe-core: {result.stderr}")
 
-        if os.path.exists(output_path):
-            with open(output_path, 'r', encoding='utf-8') as f:
-                data = json.load(f)
-            os.unlink(output_path)
+        stdout = result.stdout.strip()
+        if not stdout:
+            raise HTTPException(status_code=500, detail="No output from axe-core")
 
-            violations = data.get('violations', [])
-            processed = []
-            for v in violations:
-                processed.append({
-                    "id": v.get("id"),
-                    "impact": v.get("impact"),
-                    "description": v.get("description"),
-                    "help": v.get("help"),
-                    "helpUrl": v.get("helpUrl"),
-                    "tags": v.get("tags", []),
-                    "nodes": [
-                        {
-                            "target": n.get("target"),
-                            "html": n.get("html"),
-                            "failureSummary": n.get("failureSummary")
-                        }
-                        for n in v.get("nodes", [])
-                    ]
-                })
+        data = json.loads(stdout)
+        # axe --stdout returns a list with one result object per URL
+        if isinstance(data, list):
+            if not data:
+                raise HTTPException(status_code=500, detail="Empty axe output")
+            data = data[0]
 
-            return {
-                "url": url,
-                "totalViolations": len(processed),
-                "violations": processed
-            }
-        else:
-            raise HTTPException(status_code=500, detail="No se pudo generar el archivo de resultados")
+        violations = data.get('violations', [])
+        processed = []
+        for v in violations:
+            processed.append({
+                "id": v.get("id"),
+                "impact": v.get("impact"),
+                "description": v.get("description"),
+                "help": v.get("help"),
+                "helpUrl": v.get("helpUrl"),
+                "tags": v.get("tags", []),
+                "nodes": [
+                    {
+                        "target": n.get("target"),
+                        "html": n.get("html"),
+                        "failureSummary": n.get("failureSummary")
+                    }
+                    for n in v.get("nodes", [])
+                ]
+            })
+
+        return {
+            "url": url,
+            "totalViolations": len(processed),
+            "violations": processed
+        }
 
     except subprocess.TimeoutExpired:
         raise HTTPException(status_code=504, detail="Timeout al ejecutar axe-core")
     except HTTPException:
         raise
     except Exception as e:
-        if os.path.exists(output_path):
-            os.unlink(output_path)
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/audit")
