@@ -111,6 +111,7 @@ def transform_axe_to_report_format(axe_results: Dict[str, Any], url: str = "") -
             'issue': issue,
             'severity': severity,
             'business_impact': business_impact,
+            'rule_id': violation.get('id', 'unknown-issue'),
             'before': before,
             'after': after
         }
