@@ -43,7 +43,18 @@ async def audit_url(url: str) -> dict:
     return report_data
 
 
-def main():
+import argparse
+
+async def main(url: str):
+    violations = await audit_url(url)
+    report = _compute_summary(violations)
+    generate_pdf_report(violations, f'report_{url.replace("https://", "")}.pdf')
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('url', type=str)
+    args = parser.parse_args()
+    main(args.url)
     parser = argparse.ArgumentParser(
         description="Audit Engine — auditoría de accesibilidad de punta a punta"
     )
